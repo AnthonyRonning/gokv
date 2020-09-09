@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"strings"
+
 	"github.com/go-redis/redis"
 
 	"github.com/philippgille/gokv/encoding"
@@ -9,7 +11,7 @@ import (
 
 // Client is a gokv.Store implementation for Redis.
 type Client struct {
-	c     *redis.Client
+	c     redis.UniversalClient
 	codec encoding.Codec
 }
 
@@ -79,7 +81,7 @@ func (c Client) Close() error {
 
 // Options are the options for the Redis client.
 type Options struct {
-	// Address of the Redis server, including the port.
+	// Comma delimited address of the Redis server(s), including the port.
 	// Optional ("localhost:6379" by default).
 	Address string
 	// Password for the Redis server.
@@ -88,6 +90,9 @@ type Options struct {
 	// DB to use.
 	// Optional (0 by default).
 	DB int
+	// MasterName to use if using a sentinel master.
+	// Optional ("" by default).
+	MasterName string
 	// Encoding format.
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
@@ -115,10 +120,13 @@ func NewClient(options Options) (Client, error) {
 		options.Codec = DefaultOptions.Codec
 	}
 
-	client := redis.NewClient(&redis.Options{
-		Addr:     options.Address,
-		Password: options.Password,
-		DB:       options.DB,
+	addrs := strings.Split(options.Address, ",")
+
+	client := redis.NewUniversalClient(&redis.UniversalOptions{
+		Addrs:      addrs,
+		Password:   options.Password,
+		DB:         options.DB,
+		MasterName: options.MasterName,
 	})
 
 	err := client.Ping().Err()
