@@ -14,6 +14,7 @@ import (
 // Don't use the default number ("0"),
 // which could lead to valuable data being deleted when a developer accidentally runs the test with valuable data in DB 0.
 var testDbNumber = 15 // 16 DBs by default (unchanged config), starting with 0
+var testMasterName = "mymaster"
 
 // TestClient tests if reading from, writing to and deleting from the store works properly.
 // A struct is used as value. See TestTypes() for a test that is simpler but tests all types.

@@ -1,4 +1,4 @@
-module github.com/philippgille/gokv/redis
+module github.com/anthonyronning/gokv/redis
 
 go 1.13
 
